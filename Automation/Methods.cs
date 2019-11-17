@@ -21,7 +21,7 @@ namespace Automation
             IWebDriver driver = new FirefoxDriver();
 
             //enter URL for log in page
-            driver.Navigate().GoToUrl("https://login.live.com/login.srf?wa=wsignin1.0&rpsnv=13&ct=1552314175&rver=6.7.6631.0&wp=MBI_SSL&wreply=https%3a%2f%2fwww.bing.com%2fsecure%2fPassport.aspx%3frequrl%3dhttps%253a%252f%252fwww.bing.com%252f%253fwlexpsignin%253d1%26sig%3d1590AE9E3BD0685321E7A3823A786966&lc=1033&id=264960&CSRFToken=053ce532-98dc-4eae-8c5f-4a46b7385945&aadredir=1");
+            driver.Navigate().GoToUrl("Bing Log in page");
 
             //getting email textbox & passing your@email
             driver.FindElement(By.Id("i0116")).SendKeys("your@email");
