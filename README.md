@@ -1,11 +1,5 @@
 # Automatic Bing Search
 
-You will need to download selenium NuGet package in order to get WebDriver objects.
+In appsettings.json add as menu user objects to BingUsers array as you have to do searches with. Update the SignIn URL, and if it does not have enough time to fill in the forms with your internet speed increase the SleepTime to what works best for you.
 
-*Change log in URL to correct URL on your machine
-
-*Change Email and Password credentials to log in to your bing account.
-
-*Change Thread.Sleep() values for slower internet connections. 
-
-*Update words list with more search terms if necessary
+Update the SearchTerms with more terms if necessary.
