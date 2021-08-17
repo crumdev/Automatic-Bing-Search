@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Automation
 {
@@ -10,7 +6,7 @@ namespace Automation
     {
         static void Main(string[] args)
         {
-            Methods.SearchWeb();
+            Console.WriteLine("Hello World!");
         }
     }
 }
