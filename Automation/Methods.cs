@@ -66,7 +66,7 @@ namespace Automation
                 {
                     Random random = new Random();
                     int index = random.Next(words.Count);
-                    var name = words[index];
+                    var searchItem = words[index];
                     //remove searched word from list (Only want to search each word once)
                     words.RemoveAt(index);
 
