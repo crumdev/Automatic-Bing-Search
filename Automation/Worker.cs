@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Automation.Models;
@@ -23,12 +21,12 @@ namespace Automation
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (!stoppingToken.IsCancellationRequested)
-            {
+            //while (!stoppingToken.IsCancellationRequested)
+            //{
                 _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
                 _webworker.SearchWeb();
                 await Task.Delay(1000, stoppingToken);
-            }
+            //}
         }
     }
 }
