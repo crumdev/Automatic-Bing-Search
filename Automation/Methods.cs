@@ -41,6 +41,9 @@ namespace Automation
 
                 int x = 0;
                 var words = GetRandomWords(user.SearchCount);
+
+
+
                 while (x < user.SearchCount)
                 {
                     Random random = new();
