@@ -8,80 +8,107 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Edge;
 
 namespace Automation
 {
     class Methods
     {
+        const string emailInputId = "i0116";
+        const string nextButtonId = "idSIButton9";
+        const string passwordInputId = "i0118";
+        const string noButtonId = "idBtn_Back";
+        const string searchBarId = "sb_form_q";
         private readonly AutomationOptions _options;
+        //private readonly IWebDriver driver = new FirefoxDriver();
+        private IWebDriver driver = new ChromeDriver();
         public Methods(IOptions<AutomationOptions> options) => _options = options.Value;
-                
+
         public void SearchWeb()
         {
             foreach (BingUser user in _options.BingUsers)
             {
-                IWebDriver driver = new FirefoxDriver();
+                LaunchBrowserToSignInPage(_options.SignInUrl);
+                EnterEmail(user.Email);
+                EnterPassword(user.Password);
+                DenyStayingSignedIn();
 
-                //enter URL for log in page
-                driver.Navigate().GoToUrl(_options.SignInUrl);
+                var wordsToSearch = GetRandomWords(user.SearchCount);
 
-                //getting email textbox & passing user.email
-                driver.FindElement(By.Id("i0116")).SendKeys(user.Email);
-                driver.FindElement(By.Id("idSIButton9")).Click();
-                Thread.Sleep(_options.SleepTime);
-
-                //getting password textbox & passing user.password
-                driver.FindElement(By.Id("i0118")).SendKeys(user.Password);
-                driver.FindElement(By.Id("idSIButton9")).Click();
-                Thread.Sleep(_options.SleepTime);
-
-                //clicking 'no' when asked to stay signed in
-                driver.FindElement(By.Id("idBtn_Back")).Click();
-                Thread.Sleep(_options.SleepTime);
-
-                int x = 0;
-                var words = GetRandomWords(user.SearchCount);
-                while (x < user.SearchCount)
+                foreach (string word in wordsToSearch)
                 {
-                    Random random = new();
-                    int index = random.Next(words.Count);
-                    var searchItem = words[index];
-                    //remove searched word from list (Only want to search each word once)
-                    words.RemoveAt(index);
-
-                    //clicking into search bar
-                    driver.FindElement(By.Id("sb_form_q")).Click();
-                    Thread.Sleep(_options.SleepTime);
-
-                    //passing word from list into search bar
-                    driver.FindElement(By.Id("sb_form_q")).SendKeys(searchItem);
-                    Thread.Sleep(_options.SleepTime);
-
-                    //execute search function
-                    driver.FindElement(By.Id("sb_form_q")).SendKeys(Keys.Enter);
-                    Thread.Sleep(_options.SleepTime);
-
-                    //clear search bar
-                    driver.FindElement(By.Id("sb_form_q")).Clear();
-                    x++;
+                    ClickIntoSearchBar();
+                    PassWordIntoSearchBar(word);
+                    ExecuteSearch();
+                    ClearSearchBar();
                 }
-
-            //Close the browser
-            driver.Quit();
-            Thread.Sleep(_options.SleepTime);
-           }
+                CloseBrowser();
+            }
         }
 
-
-        public List<string> GetRandomWords(int numberOfWords)
+        void CloseBrowser()
         {
-            List<string> randomWords = new();
+            driver.Quit();
+            //Thread.Sleep(_options.SleepTime);
+        }
+
+        void ClearSearchBar()
+        {
+            driver.FindElement(By.Id(searchBarId)).Clear();
+        }
+
+        void ExecuteSearch()
+        {
+            driver.FindElement(By.Id(searchBarId)).SendKeys(Keys.Enter);
+            Thread.Sleep(_options.SleepTime);
+        }
+
+        void PassWordIntoSearchBar(string word)
+        {
+            driver.FindElement(By.Id(searchBarId)).SendKeys(word);
+            Thread.Sleep(_options.SleepTime);
+        }
+
+        void ClickIntoSearchBar()
+        {
+            driver.FindElement(By.Id(searchBarId)).Click();
+            Thread.Sleep(_options.SleepTime);
+        }
+
+        void DenyStayingSignedIn()
+        {
+            driver.FindElement(By.Id(noButtonId)).Click();
+            Thread.Sleep(_options.SleepTime);
+        }
+
+        void EnterPassword(string password)
+        {
+            driver.FindElement(By.Id(passwordInputId)).SendKeys(password);
+            driver.FindElement(By.Id(nextButtonId)).Click();
+            Thread.Sleep(_options.SleepTime);
+        }
+
+        void EnterEmail(string email)
+        {
+            driver.FindElement(By.Id(emailInputId)).SendKeys(email);
+            driver.FindElement(By.Id(nextButtonId)).Click();
+            Thread.Sleep(_options.SleepTime);
+        }
+
+        void LaunchBrowserToSignInPage(string URL)
+        {
+            driver.Navigate().GoToUrl(URL);
+        }
+
+        static List<string> GetRandomWords(int numberOfWords)
+        {
             using var client = new HttpClient();
             client.BaseAddress = new Uri("https://random-word-api.herokuapp.com/");
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             HttpResponseMessage response = client.GetAsync("word?number=" + numberOfWords.ToString()).Result;
-            randomWords = JsonConvert.DeserializeObject<List<string>>(response.Content.ReadAsStringAsync().Result);
+            List<string> randomWords = JsonConvert.DeserializeObject<List<string>>(response.Content.ReadAsStringAsync().Result);
             return randomWords;
         }
     }
