@@ -21,84 +21,60 @@ namespace Automation
         const string noButtonId = "idBtn_Back";
         const string searchBarId = "sb_form_q";
         private readonly AutomationOptions _options;
-        //private readonly IWebDriver driver = new FirefoxDriver();
-        private IWebDriver driver = new ChromeDriver();
         public Methods(IOptions<AutomationOptions> options) => _options = options.Value;
 
         public void SearchWeb()
         {
             foreach (BingUser user in _options.BingUsers)
             {
-                LaunchBrowserToSignInPage(_options.SignInUrl);
-                EnterEmail(user.Email);
-                EnterPassword(user.Password);
-                DenyStayingSignedIn();
+                IWebDriver driver = new ChromeDriver();
+                //IWebDriver driver = new FirefoxDriver();
+                LaunchBrowserToSignInPage(_options.SignInUrl, driver);
+                EnterEmail(user.Email, driver);
+                EnterPassword(user.Password, driver);
+                DenyStayingSignedIn(driver);
 
                 var wordsToSearch = GetRandomWords(user.SearchCount);
 
                 foreach (string word in wordsToSearch)
                 {
-                    ClickIntoSearchBar();
-                    PassWordIntoSearchBar(word);
-                    ExecuteSearch();
-                    ClearSearchBar();
+                    ClickIntoSearchBar(driver);
+                    PassWordIntoSearchBar(word, driver);
+                    ExecuteSearch(driver);
+                    ClearSearchBar(driver);
                 }
-                CloseBrowser();
+                CloseBrowser(driver);
+
+                if (UserIsLastInList(user, _options.BingUsers))
+                {
+                    CleanUp(driver);
+                }
             }
         }
 
-        void CloseBrowser()
+        void LaunchBrowserToSignInPage(string URL, IWebDriver driver)
         {
-            driver.Quit();
-            //Thread.Sleep(_options.SleepTime);
+            driver.Navigate().GoToUrl(URL);
         }
 
-        void ClearSearchBar()
-        {
-            driver.FindElement(By.Id(searchBarId)).Clear();
-        }
-
-        void ExecuteSearch()
-        {
-            driver.FindElement(By.Id(searchBarId)).SendKeys(Keys.Enter);
-            Thread.Sleep(_options.SleepTime);
-        }
-
-        void PassWordIntoSearchBar(string word)
-        {
-            driver.FindElement(By.Id(searchBarId)).SendKeys(word);
-            Thread.Sleep(_options.SleepTime);
-        }
-
-        void ClickIntoSearchBar()
-        {
-            driver.FindElement(By.Id(searchBarId)).Click();
-            Thread.Sleep(_options.SleepTime);
-        }
-
-        void DenyStayingSignedIn()
-        {
-            driver.FindElement(By.Id(noButtonId)).Click();
-            Thread.Sleep(_options.SleepTime);
-        }
-
-        void EnterPassword(string password)
-        {
-            driver.FindElement(By.Id(passwordInputId)).SendKeys(password);
-            driver.FindElement(By.Id(nextButtonId)).Click();
-            Thread.Sleep(_options.SleepTime);
-        }
-
-        void EnterEmail(string email)
+        void EnterEmail(string email, IWebDriver driver)
         {
             driver.FindElement(By.Id(emailInputId)).SendKeys(email);
             driver.FindElement(By.Id(nextButtonId)).Click();
             Thread.Sleep(_options.SleepTime);
         }
 
-        void LaunchBrowserToSignInPage(string URL)
+        void EnterPassword(string password, IWebDriver driver)
         {
-            driver.Navigate().GoToUrl(URL);
+            driver.FindElement(By.Id(passwordInputId)).SendKeys(password);
+            driver.FindElement(By.Id(nextButtonId)).Click();
+            Thread.Sleep(_options.SleepTime);
+        }
+
+        void DenyStayingSignedIn(IWebDriver driver)
+        {
+            driver.FindElement(By.Id(noButtonId)).Click();
+            Thread.Sleep(_options.SleepTime);
         }
 
         static List<string> GetRandomWords(int numberOfWords)
@@ -110,6 +86,45 @@ namespace Automation
             HttpResponseMessage response = client.GetAsync("word?number=" + numberOfWords.ToString()).Result;
             List<string> randomWords = JsonConvert.DeserializeObject<List<string>>(response.Content.ReadAsStringAsync().Result);
             return randomWords;
+        }
+
+        void ClickIntoSearchBar(IWebDriver driver)
+        {
+            driver.FindElement(By.Id(searchBarId)).Click();
+            Thread.Sleep(_options.SleepTime);
+        }
+
+        void PassWordIntoSearchBar(string word, IWebDriver driver)
+        {
+            driver.FindElement(By.Id(searchBarId)).SendKeys(word);
+            Thread.Sleep(_options.SleepTime);
+        }
+
+        void ExecuteSearch(IWebDriver driver)
+        {
+            driver.FindElement(By.Id(searchBarId)).SendKeys(Keys.Enter);
+            Thread.Sleep(_options.SleepTime);
+        }
+
+        void ClearSearchBar(IWebDriver driver)
+        {
+            driver.FindElement(By.Id(searchBarId)).Clear();
+        }
+
+        void CloseBrowser(IWebDriver driver)
+        {
+            driver.Close();
+        }
+
+        bool UserIsLastInList(BingUser currentUser, List<BingUser> users)
+        {
+            return users.IndexOf(currentUser) == users.Count - 1;
+        }
+
+        void CleanUp(IWebDriver driver)
+        {
+            driver.Quit();
+            driver.Dispose();
         }
     }
 }
