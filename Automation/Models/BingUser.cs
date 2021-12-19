@@ -3,5 +3,7 @@ namespace Automation.Models {
         public string Email { get; set; }
         public string Password { get; set; }
         public int SearchCount { get; set; }
+        public int SearchCountMobile { get; set; }
+
     }
 }

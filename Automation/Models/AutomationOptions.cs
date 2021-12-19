@@ -7,6 +7,5 @@ namespace Automation.Models
         public List<BingUser> BingUsers { get; set; }
         public string SignInUrl { get; set; }
         public int SleepTime { get; set; }
-        //public List<string> SearchTerms { get; set; }
     }
 }

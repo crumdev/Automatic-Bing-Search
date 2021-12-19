@@ -15,6 +15,7 @@ namespace Automation
 {
     class Methods
     {
+        IWebDriver webDriver;
         const string emailInputId = "i0116";
         const string nextButtonId = "idSIButton9";
         const string passwordInputId = "i0118";
@@ -23,57 +24,67 @@ namespace Automation
         private readonly AutomationOptions _options;
         public Methods(IOptions<AutomationOptions> options) => _options = options.Value;
 
-        public void SearchWeb()
+        public void SearchWebInMobileMode()
         {
             foreach (BingUser user in _options.BingUsers)
             {
-                IWebDriver driver = new ChromeDriver();
-                //IWebDriver driver = new FirefoxDriver();
-                LaunchBrowserToSignInPage(_options.SignInUrl, driver);
-                EnterEmail(user.Email, driver);
-                EnterPassword(user.Password, driver);
-                DenyStayingSignedIn(driver);
-
-                var wordsToSearch = GetRandomWords(user.SearchCount);
-
-                foreach (string word in wordsToSearch)
-                {
-                    ClickIntoSearchBar(driver);
-                    PassWordIntoSearchBar(word, driver);
-                    ExecuteSearch(driver);
-                    ClearSearchBar(driver);
-                }
-                CloseBrowser(driver);
-
-                if (UserIsLastInList(user, _options.BingUsers))
-                {
-                    CleanUp(driver);
-                }
+                ChromeOptions chromeOptions = new();
+                chromeOptions.EnableMobileEmulation("iPhone X");
+                webDriver = new ChromeDriver(chromeOptions);
+                StartSearchProcess(user, user.SearchCountMobile);
             }
         }
 
-        void LaunchBrowserToSignInPage(string URL, IWebDriver driver)
+        public void SearchWebInDesktopMode()
         {
-            driver.Navigate().GoToUrl(URL);
+            foreach (BingUser user in _options.BingUsers)
+            {
+                webDriver = new ChromeDriver();
+                StartSearchProcess(user, user.SearchCount);
+            }
         }
 
-        void EnterEmail(string email, IWebDriver driver)
+        public void StartSearchProcess(BingUser user, int searchCount)
         {
-            driver.FindElement(By.Id(emailInputId)).SendKeys(email);
-            driver.FindElement(By.Id(nextButtonId)).Click();
+                LaunchBrowserToSignInPage(_options.SignInUrl);
+                EnterEmail(user.Email);
+                EnterPassword(user.Password);
+                DenyStayingSignedIn();
+
+                var wordsToSearch = GetRandomWords(searchCount);
+
+                foreach (string word in wordsToSearch)
+                {
+                    ClickIntoSearchBar();
+                    PassWordIntoSearchBar(word);
+                    ExecuteSearch();
+                    ClearSearchBar();
+                }
+                CloseBrowser();
+        }
+
+        void LaunchBrowserToSignInPage(string URL)
+        {
+            webDriver.Navigate().GoToUrl(URL);
+        }
+
+        void EnterEmail(string email)
+        {
+            webDriver.FindElement(By.Id(emailInputId)).SendKeys(email);
+            webDriver.FindElement(By.Id(nextButtonId)).Click();
             Thread.Sleep(_options.SleepTime);
         }
 
-        void EnterPassword(string password, IWebDriver driver)
+        void EnterPassword(string password)
         {
-            driver.FindElement(By.Id(passwordInputId)).SendKeys(password);
-            driver.FindElement(By.Id(nextButtonId)).Click();
+            webDriver.FindElement(By.Id(passwordInputId)).SendKeys(password);
+            webDriver.FindElement(By.Id(nextButtonId)).Click();
             Thread.Sleep(_options.SleepTime);
         }
 
-        void DenyStayingSignedIn(IWebDriver driver)
+        void DenyStayingSignedIn()
         {
-            driver.FindElement(By.Id(noButtonId)).Click();
+            webDriver.FindElement(By.Id(noButtonId)).Click();
             Thread.Sleep(_options.SleepTime);
         }
 
@@ -88,43 +99,43 @@ namespace Automation
             return randomWords;
         }
 
-        void ClickIntoSearchBar(IWebDriver driver)
+        void ClickIntoSearchBar()
         {
-            driver.FindElement(By.Id(searchBarId)).Click();
+            webDriver.FindElement(By.Id(searchBarId)).Click();
             Thread.Sleep(_options.SleepTime);
         }
 
-        void PassWordIntoSearchBar(string word, IWebDriver driver)
+        void PassWordIntoSearchBar(string word)
         {
-            driver.FindElement(By.Id(searchBarId)).SendKeys(word);
+            webDriver.FindElement(By.Id(searchBarId)).SendKeys(word);
             Thread.Sleep(_options.SleepTime);
         }
 
-        void ExecuteSearch(IWebDriver driver)
+        void ExecuteSearch()
         {
-            driver.FindElement(By.Id(searchBarId)).SendKeys(Keys.Enter);
+            webDriver.FindElement(By.Id(searchBarId)).SendKeys(Keys.Enter);
             Thread.Sleep(_options.SleepTime);
         }
 
-        void ClearSearchBar(IWebDriver driver)
+        void ClearSearchBar()
         {
-            driver.FindElement(By.Id(searchBarId)).Clear();
+            webDriver.FindElement(By.Id(searchBarId)).Clear();
         }
 
-        void CloseBrowser(IWebDriver driver)
+        void CloseBrowser()
         {
-            driver.Close();
+            webDriver.Close();
         }
 
-        bool UserIsLastInList(BingUser currentUser, List<BingUser> users)
-        {
-            return users.IndexOf(currentUser) == users.Count - 1;
-        }
+        //bool UserIsLastInList(BingUser currentUser, List<BingUser> users)
+        //{
+        //    return users.IndexOf(currentUser) == users.Count - 1;
+        //}
 
-        void CleanUp(IWebDriver driver)
+        public void CleanUp()
         {
-            driver.Quit();
-            driver.Dispose();
+            webDriver.Quit();
+            webDriver.Dispose();
         }
     }
 }

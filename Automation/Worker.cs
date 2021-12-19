@@ -21,12 +21,11 @@ namespace Automation
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            //while (!stoppingToken.IsCancellationRequested)
-            //{
-                _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                _webworker.SearchWeb();
-                await Task.Delay(1000, stoppingToken);
-            //}
+            _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+            _webworker.SearchWebInDesktopMode();
+            _webworker.SearchWebInMobileMode();
+            _webworker.CleanUp();
+            await Task.Delay(1000, stoppingToken);
         }
     }
 }
