@@ -13,7 +13,7 @@ using OpenQA.Selenium.Edge;
 
 namespace Automation
 {
-    class Methods
+    public class Methods
     {
         IWebDriver webDriver;
         const string emailInputId = "i0116";
@@ -88,7 +88,7 @@ namespace Automation
             Thread.Sleep(_options.SleepTime);
         }
 
-        static List<string> GetRandomWords(int numberOfWords)
+        public List<string> GetRandomWords(int numberOfWords)
         {
             using var client = new HttpClient();
             client.BaseAddress = new Uri("https://random-word-api.herokuapp.com/");
