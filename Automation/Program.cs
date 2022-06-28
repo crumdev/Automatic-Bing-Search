@@ -16,6 +16,7 @@ namespace Automation
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddOptions<AutomationOptions>().Bind(hostContext.Configuration.GetSection("AutomationOptions"));
+                    services.AddSingleton<IMethods, Methods>();
                     services.AddHostedService<Worker>();
                 });
     }
