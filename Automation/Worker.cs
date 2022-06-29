@@ -11,12 +11,12 @@ namespace Automation
     public class Worker : BackgroundService
     {
         private readonly ILogger<Worker> _logger;
-        private readonly Methods _webworker;
+        private readonly IMethods _webworker;
 
-        public Worker(ILogger<Worker> logger, IOptions<AutomationOptions> options)
+        public Worker(ILogger<Worker> logger, IOptions<AutomationOptions> options, IMethods webworker)
         {
             _logger = logger;
-            _webworker = new Methods(options);
+            _webworker = webworker;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -24,7 +24,7 @@ namespace Automation
             _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
             _webworker.SearchWebInDesktopMode();
             _webworker.SearchWebInMobileMode();
-            _webworker.CleanUp();
+            _logger.LogInformation("Worker finished at: {time}", DateTimeOffset.Now);
             await Task.Delay(1000, stoppingToken);
         }
     }

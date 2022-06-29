@@ -10,10 +10,12 @@ using System.Net.Http.Headers;
 using Newtonsoft.Json;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
+using Microsoft.Extensions.Logging;
 
 namespace Automation
 {
-    public class Methods
+
+    public class Methods : IMethods
     {
         IWebDriver webDriver;
         const string emailInputId = "i0116";
@@ -22,13 +24,30 @@ namespace Automation
         const string noButtonId = "idBtn_Back";
         const string searchBarId = "sb_form_q";
         private readonly AutomationOptions _options;
-        public Methods(IOptions<AutomationOptions> options) => _options = options.Value;
+        private readonly ILogger<Methods> _logger;
+
+        public Methods(ILogger<Methods> logger, IOptions<AutomationOptions> options)
+        {
+            _options = options.Value;
+            _logger = logger;
+        }
 
         public void SearchWebInMobileMode()
         {
             foreach (BingUser user in _options.BingUsers)
             {
+                _logger.LogInformation($"Starting Mobile Browser for: {user.Email}");
                 ChromeOptions chromeOptions = new();
+                if(_options.Headless)
+                {
+                    chromeOptions.AddArguments(new List<string>(){
+                    "--silent-launch",
+                    "--no-startup-window",
+                    "no-sandbox",
+                    "headless"
+                    });
+                }
+                
                 chromeOptions.EnableMobileEmulation("iPhone X");
                 webDriver = new ChromeDriver(chromeOptions);
                 StartSearchProcess(user, user.SearchCountMobile);
@@ -39,28 +58,40 @@ namespace Automation
         {
             foreach (BingUser user in _options.BingUsers)
             {
-                webDriver = new ChromeDriver();
+                _logger.LogInformation($"Starting Desktop Browser for: {user.Email}");
+
+                ChromeOptions chromeOptions = new();
+                if(_options.Headless)
+                {
+                    chromeOptions.AddArguments(new List<string>(){
+                    "--silent-launch",
+                    "--no-startup-window",
+                    "no-sandbox",
+                    "headless"
+                    });
+                }
+                webDriver = new ChromeDriver(chromeOptions);
                 StartSearchProcess(user, user.SearchCount);
             }
         }
 
         public void StartSearchProcess(BingUser user, int searchCount)
         {
-                LaunchBrowserToSignInPage(_options.SignInUrl);
-                EnterEmail(user.Email);
-                EnterPassword(user.Password);
-                DenyStayingSignedIn();
+            LaunchBrowserToSignInPage(_options.SignInUrl);
+            EnterEmail(user.Email);
+            EnterPassword(user.Password);
+            DenyStayingSignedIn();
 
-                var wordsToSearch = GetRandomWords(searchCount);
+            var wordsToSearch = GetRandomWords(searchCount);
 
-                foreach (string word in wordsToSearch)
-                {
-                    ClickIntoSearchBar();
-                    PassWordIntoSearchBar(word);
-                    ExecuteSearch();
-                    ClearSearchBar();
-                }
-                CloseBrowser();
+            foreach (string word in wordsToSearch)
+            {
+                ClickIntoSearchBar();
+                PassWordIntoSearchBar(word);
+                ExecuteSearch();
+                ClearSearchBar();
+            }
+            CloseBrowser();
         }
 
         void LaunchBrowserToSignInPage(string URL)
@@ -70,6 +101,7 @@ namespace Automation
 
         void EnterEmail(string email)
         {
+            _logger.LogInformation("Entering email");
             webDriver.FindElement(By.Id(emailInputId)).SendKeys(email);
             webDriver.FindElement(By.Id(nextButtonId)).Click();
             Thread.Sleep(_options.SleepTime);
@@ -77,6 +109,7 @@ namespace Automation
 
         void EnterPassword(string password)
         {
+            _logger.LogInformation("Entering password");
             webDriver.FindElement(By.Id(passwordInputId)).SendKeys(password);
             webDriver.FindElement(By.Id(nextButtonId)).Click();
             Thread.Sleep(_options.SleepTime);
@@ -84,6 +117,7 @@ namespace Automation
 
         void DenyStayingSignedIn()
         {
+            _logger.LogInformation("Deny staying logged in");
             webDriver.FindElement(By.Id(noButtonId)).Click();
             Thread.Sleep(_options.SleepTime);
         }
@@ -91,39 +125,45 @@ namespace Automation
         public List<string> GetRandomWords(int numberOfWords)
         {
             using var client = new HttpClient();
-            client.BaseAddress = new Uri("https://random-word-api.herokuapp.com/");
+            client.BaseAddress = new Uri("https://random-word.ryanrk.com/api/en/word/random/");
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            HttpResponseMessage response = client.GetAsync("word?number=" + numberOfWords.ToString()).Result;
+            HttpResponseMessage response = client.GetAsync(numberOfWords.ToString()).Result;
             List<string> randomWords = JsonConvert.DeserializeObject<List<string>>(response.Content.ReadAsStringAsync().Result);
+            _logger.LogInformation($"Retrieved list of random words");
             return randomWords;
         }
 
         void ClickIntoSearchBar()
         {
+            _logger.LogInformation("Selecting Search Bar");
             webDriver.FindElement(By.Id(searchBarId)).Click();
             Thread.Sleep(_options.SleepTime);
         }
 
         void PassWordIntoSearchBar(string word)
         {
+            _logger.LogInformation($"Typing: {word}");
             webDriver.FindElement(By.Id(searchBarId)).SendKeys(word);
             Thread.Sleep(_options.SleepTime);
         }
 
         void ExecuteSearch()
         {
+            _logger.LogInformation("Starting search");
             webDriver.FindElement(By.Id(searchBarId)).SendKeys(Keys.Enter);
             Thread.Sleep(_options.SleepTime);
         }
 
         void ClearSearchBar()
         {
+            _logger.LogInformation("Clearing Search");
             webDriver.FindElement(By.Id(searchBarId)).Clear();
         }
 
         void CloseBrowser()
         {
+            _logger.LogInformation("Closing Browser");
             webDriver.Close();
         }
 
@@ -134,6 +174,7 @@ namespace Automation
 
         public void CleanUp()
         {
+            _logger.LogInformation("Cleaning Up");
             webDriver.Quit();
             webDriver.Dispose();
         }
