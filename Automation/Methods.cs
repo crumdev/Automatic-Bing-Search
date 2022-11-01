@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Threading;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Firefox;
 using Automation.Models;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
-using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
 using Microsoft.Extensions.Logging;
 
@@ -37,19 +35,18 @@ namespace Automation
             foreach (BingUser user in _options.BingUsers)
             {
                 _logger.LogInformation($"Starting Mobile Browser for: {user.Email}");
-                ChromeOptions chromeOptions = new();
-                if(_options.Headless)
-                {
-                    chromeOptions.AddArguments(new List<string>(){
-                    "--silent-launch",
-                    "--no-startup-window",
-                    "no-sandbox",
-                    "headless"
-                    });
-                }
+                EdgeOptions edgeOptions = new();
                 
-                chromeOptions.EnableMobileEmulation("iPhone X");
-                webDriver = new ChromeDriver(chromeOptions);
+                edgeOptions.AddArguments(new List<string>(){
+                    "headless",
+                    "--profile-directory=Profile 5",
+                    "disable-gpu"
+                });
+
+
+                
+                edgeOptions.EnableMobileEmulation("iPhone X");
+                webDriver = new EdgeDriver(edgeOptions);
                 StartSearchProcess(user, user.SearchCountMobile);
             }
         }
@@ -60,17 +57,13 @@ namespace Automation
             {
                 _logger.LogInformation($"Starting Desktop Browser for: {user.Email}");
 
-                ChromeOptions chromeOptions = new();
-                if(_options.Headless)
-                {
-                    chromeOptions.AddArguments(new List<string>(){
-                    "--silent-launch",
-                    "--no-startup-window",
-                    "no-sandbox",
-                    "headless"
-                    });
-                }
-                webDriver = new ChromeDriver(chromeOptions);
+                EdgeOptions edgeOptions = new();
+                edgeOptions.AddArguments(new List<string>(){
+                    "headless",
+                    "--profile-directory=Profile 5",
+                    "disable-gpu"
+                });
+                webDriver = new EdgeDriver(edgeOptions);
                 StartSearchProcess(user, user.SearchCount);
             }
         }
