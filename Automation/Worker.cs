@@ -22,7 +22,9 @@ namespace Automation
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+            _logger.LogInformation("Attempting to launch browser in desktop mode...");
             _webworker.SearchWebInDesktopMode();
+            _logger.LogInformation("Attempting to launch browser in mobile mode...");
             _webworker.SearchWebInMobileMode();
             _logger.LogInformation("Worker finished at: {time}", DateTimeOffset.Now);
             await Task.Delay(1000, stoppingToken);

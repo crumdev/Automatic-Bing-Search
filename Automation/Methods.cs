@@ -164,7 +164,8 @@ namespace Automation
         void CloseBrowser()
         {
             _logger.LogInformation("Closing Browser");
-            webDriver.Close();
+            webDriver.Quit();
+            webDriver = null;
         }
 
         //bool UserIsLastInList(BingUser currentUser, List<BingUser> users)
