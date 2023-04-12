@@ -61,6 +61,7 @@ jobs:
       Project_Path: ./Automation
       Publish_Path: ./packages
       Major: 1 # rest of version is set as {Major}.yyyyMMdd.{runNumber}
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: true #needed to calculate version number below
 
     steps:
     - name: Checkout
