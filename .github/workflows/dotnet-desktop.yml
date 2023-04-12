@@ -86,7 +86,7 @@ jobs:
     # Dotnet build and publish
     - name: Dotnet Publish
       run: | 
-       dotnet publish --project $env:Project_Path -o $env:Publish_Path /p:AssemblyVersion=$env:VERSION_NUMBER
+       dotnet publish --project $Project_Path -o $Publish_Path /p:AssemblyVersion=$VERSION_NUMBER
     
     - name: Create Release
       id: create_release
@@ -94,8 +94,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ VERSION_NUMBER }}
-        release_name: Release ${{ VERSION_NUMBER }}
+        tag_name: $VERSION_NUMBER
+        release_name: Release $VERSION_NUMBER
         draft: false
         prerelease: false
 
