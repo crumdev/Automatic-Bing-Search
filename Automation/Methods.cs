@@ -40,6 +40,7 @@ namespace Automation
                 edgeOptions.AddArguments(new List<string>(){
                     "headless",
                     "--profile-directory=Profile 5",
+                    "--allow-top-navigation",
                     "disable-gpu"
                 });
 
@@ -61,6 +62,7 @@ namespace Automation
                 edgeOptions.AddArguments(new List<string>(){
                     "headless",
                     "--profile-directory=Profile 5",
+                    "--allow-top-navigation",
                     "disable-gpu"
                 });
                 webDriver = new EdgeDriver(edgeOptions);

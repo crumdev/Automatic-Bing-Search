@@ -1,6 +1,7 @@
 using Automation.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Hosting.WindowsServices;
 
 namespace Automation
 {
@@ -19,6 +20,6 @@ namespace Automation
                     services.AddSingleton<IMethods, Methods>();
                     services.AddHostedService<Worker>();
                 })
-                .UseWindowsServices();
+                .UseWindowsService();
     }
 }
