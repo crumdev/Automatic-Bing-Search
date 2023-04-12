@@ -83,11 +83,13 @@ jobs:
         $runNumber = $env:GITHUB_RUN_NUMBER
         $version = "$major.$date.$runNumber"
         Write-Host "##[set-env name=VERSION_NUMBER]$version"
+      shell: powershell
       
     # Dotnet build and publish
     - name: Dotnet Publish
       run: | 
        dotnet publish --project $env:PROJECT_PATH -o $env:PUBLISH_PATH /p:AssemblyVersion=$VERSION_NUMBER
+      shell: powershell
     
     - name: Create Release
       id: create_release
