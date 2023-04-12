@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Threading;
 using OpenQA.Selenium;
 using Automation.Models;
@@ -159,7 +159,8 @@ namespace Automation
         void CloseBrowser()
         {
             _logger.LogInformation("Closing Browser");
-            webDriver.Close();
+            webDriver.Quit();
+            webDriver = null;
         }
 
         //bool UserIsLastInList(BingUser currentUser, List<BingUser> users)
