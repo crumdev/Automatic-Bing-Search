@@ -41,6 +41,7 @@ mono_crash.*
 # Visual Studio 2017 auto generated files
 Generated\ Files/
 
+
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
@@ -68,6 +69,9 @@ artifacts/
 
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
+
+#secret appsettings file for local development
+secret.json
 
 # StyleCop
 StyleCopReport.xml
