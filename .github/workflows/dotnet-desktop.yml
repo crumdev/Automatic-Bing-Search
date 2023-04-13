@@ -79,7 +79,7 @@ jobs:
     - name: Set Version Number
       run: | 
         $date = Get-Date -Format yyyyMMdd
-        $version = "$env.Major" + "." + "$date" + "." + "$env.GITHUB_RUN_NUMBER"
+        $version = $env.Major + "." + "$date" + "." + $env.GITHUB_RUN_NUMBER
         Write-Host "##[set-env name=VERSION_NUMBER]$version"
       shell: powershell
       
