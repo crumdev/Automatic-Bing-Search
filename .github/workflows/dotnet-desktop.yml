@@ -59,7 +59,7 @@ jobs:
       Solution_Name: Automation.sln                         # Replace with your solution name, i.e. MyWpfApp.sln.
       Test_Project_Path: your-test-project-path                 # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
       PROJECT_PATH: ./Automation
-      PUBLISH_PATH: ./packages
+      PUBLISH_PATH: ./Automation/bin/Debug/net6.0/win-x64/publish
       Major: 1 # rest of version is set as {Major}.yyyyMMdd.{runNumber}
       ACTIONS_ALLOW_UNSECURE_COMMANDS: true #needed to calculate version number below
 
@@ -88,7 +88,7 @@ jobs:
     # Dotnet build and publish
     - name: Dotnet Publish
       run: | 
-       dotnet publish --project $env.PROJECT_PATH -p:PublishDir=$env.PUBLISH_PATH /p:AssemblyVersion=$VERSION_NUMBER
+       dotnet publish /p:AssemblyVersion=$VERSION_NUMBER
       shell: powershell
     
     - name: Create Release
