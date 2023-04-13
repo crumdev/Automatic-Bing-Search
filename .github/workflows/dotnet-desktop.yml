@@ -88,7 +88,7 @@ jobs:
     # Dotnet build and publish
     - name: Dotnet Publish
       run: | 
-       dotnet publish /p:AssemblyVersion=$VERSION_NUMBER
+       dotnet publish /p:AssemblyVersion=$env.VERSION_NUMBER
       shell: powershell
     
     - name: Create Release
@@ -97,8 +97,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: $VERSION_NUMBER
-        release_name: Release $VERSION_NUMBER
+        tag_name: $env.VERSION_NUMBER
+        release_name: Release ${{ VERSION_NUMBER }}
         draft: false
         prerelease: false
 
@@ -109,6 +109,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: $PUBLISH_PATH
+        asset_path: ${{ PUBLISH_PATH }}
         asset_name: Automatic-Bing-Search.zip
         asset_content_type: application/zip
