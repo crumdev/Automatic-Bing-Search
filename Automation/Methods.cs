@@ -39,8 +39,8 @@ namespace Automation
                 
                 edgeOptions.AddArguments(new List<string>(){
                     "headless",
-                    "--profile-directory=Profile 5",
                     "--allow-top-navigation",
+                    "--allow-top-navigation-by-user-activation",
                     "disable-gpu"
                 });
 
@@ -61,8 +61,9 @@ namespace Automation
                 EdgeOptions edgeOptions = new();
                 edgeOptions.AddArguments(new List<string>(){
                     "headless",
-                    "--profile-directory=Profile 5",
+                    "--profile-directory=Profile 6",
                     "--allow-top-navigation",
+                    "--allow-top-navigation-by-user-activation",
                     "disable-gpu"
                 });
                 webDriver = new EdgeDriver(edgeOptions);
@@ -159,8 +160,8 @@ namespace Automation
         void CloseBrowser()
         {
             _logger.LogInformation("Closing Browser");
-            webDriver.Quit();
-            webDriver = null;
+            webDriver.Close();
+            // webDriver = null;
         }
 
         //bool UserIsLastInList(BingUser currentUser, List<BingUser> users)
